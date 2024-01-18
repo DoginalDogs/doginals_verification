@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Doge Wallet Interaction</title> 
+</head>
+<style>
+    @font-face {
+        font-family: 'Retro Gaming';
+        src: url("{{ url_for('static', filename='Retro_Gaming.ttf') }}") format('truetype');
+    }
+
+    @font-face {
+        font-family: 'Varela Regular';
+        src: url("{{ url_for('static', filename='Varela-Regular.ttf') }}") format('truetype');
+    }
+
+    h1, .button {
+        font-family: 'Retro Gaming';
+    }
+
+    body {
+        
+        font-family: 'Varela Regular';
+        background-color: #fde580;
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .container {
+        text-align: center;
+    }
+
+    .container img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .button {
+        background-color: black;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        margin: 10px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .button:hover {
+        background-color: #333;
+    }
+
+    .divider-two {
+        width: 100%;
+        height: 5px;
+        -webkit-text-stroke-width: 0px;
+        -webkit-text-stroke-color: #000;
+        background-color: #000;
+        margin-top: 40px;
+        margin-bottom: 40px;
+    }
+</style>
+<body>
+    <div class="container">
+        <img width="800px" src="{{ url_for('static', filename='doginal.gif') }}" alt="Doginals Dogs">
+        <h1>Holder Verification</h1>
+        <div style="display: flex; justify-content: center;">
+            <button id="loginDiscord" class="button">Login with Discord</button>
+            <button id="logoutDiscord" class="button" style="display:none;">Logout from Discord</button>
+            <button id="loginWallet" class="button" style="display:none;">Login with Wallet</button>
+        </div>
+        <div class="divider-two"></div>
+
+        <div class="footer">
+            <p class="copyright">
+                © 2024 Doginal Dogs. All rights reserved
+            </p>
+            
+            <div>
+                <a href="https://twitter.com/doginaldogs">
+                    <img src="https://assets-global.website-files.com/6589cf4b5b7d61bf88a9c6a0/65a0ab87e2c044aba22597c2_Untitled-2_0002_Layer-1.png" width="50" alt="" >
+                </a>
+
+                <a href="http://discord.gg/doginaldogs">
+                    <img src="https://assets-global.website-files.com/6589cf4b5b7d61bf88a9c6a0/65a0ab8789973fc94a07e0bc_Untitled-2_0000_Layer-5.png" width="50" alt="">
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let userId = "{{ user_id }}";
+        let clientId = "{{ client_id }}";
+        let redirectUri = "{{ redirect_uri }}";
+        let oauthSuccess = new URLSearchParams(window.location.search).get('oauth_success') === 'True';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginDiscordButton = document.getElementById('loginDiscord');
+            const loginWalletButton = document.getElementById('loginWallet'); 
+            const logoutDiscordButton = document.getElementById('logoutDiscord');
+            
+            if (logoutDiscordButton) {
+                logoutDiscordButton.addEventListener('click', function() {
+                    logoutFromDiscord();
+                });
+            }
+
+            if (loginDiscordButton) {
+                loginDiscordButton.addEventListener('click', function() {
+                    if (clientId && redirectUri) {
+                        window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=identify`;
+                    } else {
+                        console.error("OAuth details are missing.");
+                        alert("OAuth details are missing.");
+                    }
+                });
+            }
+
+            if (oauthSuccess) {
+                loginDiscordButton.style.display = 'none';
+                logoutDiscordButton.style.display = 'block';
+                loginWalletButton.style.display = 'block'; 
+            } 
+
+            if (loginWalletButton) {
+                loginWalletButton.addEventListener('click', function() {
+                    // Call signMessageWithDogeLabsWallet function
+                    if (typeof window.dogeLabs !== 'undefined') {
+                        signMessageWithDogeLabsWallet();
+                    } else {
+                        alert("Please install the DogeLabs Wallet extension.");
+                    }
+                });
+            }
+        }); 
+
+        function logoutFromDiscord() { 
+            sessionStorage.removeItem('discordToken');
+            // or localStorage.removeItem('discordToken');
+
+            // Update UI to reflect logged out state
+            document.getElementById('loginDiscord').style.display = 'block';
+            document.getElementById('loginWallet').style.display = 'none';
+            document.getElementById('logoutDiscord').style.display = 'none'; 
+            alert('You have been logged out from Discord.');
+        }
+
+        function getDoginals(userId) {  // Assuming userId is passed as a parameter
+            window.dogeLabs.getInscriptions()
+                .then(inscriptions => {
+                    console.log("Inscriptions:", inscriptions);
+
+                    // Extract required details from each inscription
+                    const inscriptionData = inscriptions.list.map(inscription => ({
+                        user_id: userId,
+                        inscriptionNumber: inscription.inscriptionNumber,
+                        address: inscription.address 
+                    }));
+
+                    // Send the extracted data back to your server
+                    fetch('http://localhost:8000/verify_holder', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ inscriptions: inscriptionData, user_id: userId })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data); 
+                        alert('Wallet verification complete, you can return to the Discord now. After few minutes, you will get your role "Holder"');
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                })
+                .catch(error => {
+                    console.error("Error fetching inscriptions:", error.message);
+                }); 
+        }
+
+        function signMessageWithDogeLabsWallet() {
+            window.dogeLabs.getAccounts()
+                .then(accounts => {
+                    // Display accounts to the user and let them choose one
+                    // This is a simplified example. You might want to create a more user-friendly UI for account selection
+                    const userAccount = window.prompt("Select an account", accounts.join("\n"));
+
+                    if (!userAccount) {
+                        alert("No account selected");
+                        return;
+                    }
+
+                    const messageToSign = "Sign to Prove Ownership";
+                    const messageType = "text";
+
+                    window.dogeLabs.signMessage(messageToSign, messageType, userAccount)
+                        .then(signature => {
+                            console.log("Message Signature:", signature);
+                            // Rest of your logic
+                            // TODO: Ensure you have the user_id to send along with the signature 
+                            fetch('http://localhost:8000/verify_signature', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ signature: signature, user_id: userId})
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(data);
+                                getDoginals(userId); 
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                            });
+                        })
+                        .catch(error => {
+                            console.error("Error signing message:", error.message);
+                        });
+                })
+                .catch(error => {
+                    console.error("Error getting accounts:", error.message);
+                });
+        }
+    </script>
+</body>
+</html>
