@@ -1,12 +1,8 @@
-import secrets
 from flask import Flask, jsonify, render_template, request 
 from datetime import timedelta 
 import requests
 
 app = Flask(__name__) 
-
-# Set a strong, random secret key for session signing
-app.secret_key = secrets.token_hex(16)
 
 # Configure session cookie attributes for security
 app.config.update(
