@@ -1,11 +1,9 @@
 import secrets
-from flask import Flask, jsonify, render_template, request, session
-from flask_cors import CORS
+from flask import Flask, jsonify, render_template, request 
 from datetime import timedelta 
 import requests
 
-app = Flask(__name__)
-CORS(app, origins=["http://localhost:8000"])
+app = Flask(__name__) 
 
 # Set a strong, random secret key for session signing
 app.secret_key = secrets.token_hex(16)
