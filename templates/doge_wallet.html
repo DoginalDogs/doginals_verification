@@ -183,48 +183,42 @@
         }
 
         function signMessageWithDogeLabsWallet() {
-            window.dogeLabs.getAccounts()
-                .then(accounts => {
-                    // Display accounts to the user and let them choose one
-                    // This is a simplified example. You might want to create a more user-friendly UI for account selection
-                    const userAccount = window.prompt("Select an account", accounts.join("\n"));
+            if (typeof window.dogeLabs !== 'undefined') {
+                window.dogeLabs.requestAccounts()
+                    .then(accounts => { 
+                        const messageToSign = "Sign to Prove Ownership";
+                        const messageType = "text";
 
-                    if (!userAccount) {
-                        alert("No account selected");
-                        return;
-                    }
-
-                    const messageToSign = "Sign to Prove Ownership";
-                    const messageType = "text";
-
-                    window.dogeLabs.signMessage(messageToSign, messageType, userAccount)
-                        .then(signature => {
-                            console.log("Message Signature:", signature);
-                            // Rest of your logic
-                            // TODO: Ensure you have the user_id to send along with the signature 
-                            fetch('http://localhost:8000/verify_signature', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({ signature: signature, user_id: userId})
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                console.log(data);
-                                getDoginals(userId); 
+                        window.dogeLabs.signMessage(messageToSign, messageType)
+                            .then(signature => {
+                                console.log("Message Signature:", signature);
+                                // Rest of your logic
+                                fetch('http://localhost:8000/verify_signature', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({ signature: signature, user_id: userId })
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    console.log(data);
+                                    getDoginals(userId); 
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                });
                             })
                             .catch(error => {
-                                console.error('Error:', error);
+                                console.error("Error signing message:", error.message);
                             });
-                        })
-                        .catch(error => {
-                            console.error("Error signing message:", error.message);
-                        });
-                })
-                .catch(error => {
-                    console.error("Error getting accounts:", error.message);
-                });
+                    })
+                    .catch(error => {
+                        console.error("Error getting accounts:", error.message);
+                    });
+            } else {
+                alert("Please install the DogeLabs Wallet extension.");
+            }
         }
     </script>
 </body>
