@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    let clientId = 1195885802786394154;
+    let clientId = '1195885802786394154';
     let redirectUri = 'https://doginal-dogs-verification-2cc9b2edc81a.herokuapp.com/callback'
     let oauthSuccess = new URLSearchParams(window.location.search).get('oauth_success') === 'True';
 
