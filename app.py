@@ -16,8 +16,12 @@ app.config.update(
 )
 
 @app.after_request
-def set_csp(response):
-    csp = "connect-src 'self'; style-src 'self' 'unsafe-inline';"
+def set_csp(response): 
+    csp = (
+        "default-src 'self'; "
+        "style-src 'self' 'unsafe-inline'; "
+        "connect-src 'self' https://doginal-dogs-verification-2cc9b2edc81a.herokuapp.com/;"
+    )
     response.headers['Content-Security-Policy'] = csp
     return response
 
