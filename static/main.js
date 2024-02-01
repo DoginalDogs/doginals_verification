@@ -1,11 +1,11 @@
 
 
 document.addEventListener('DOMContentLoaded', function() {
-    let userId = "{{ user_id }}";
-    let clientId = "{{ client_id }}";
-    console.log(clientId)
-    let redirectUri = "{{ redirect_uri }}";
-    console.log(redirectUri)
+    // let userId = "{{ user_id }}";
+    // let clientId = "{{ client_id }}";
+    // console.log(clientId)
+    // let redirectUri = "{{ redirect_uri }}";
+    // console.log(redirectUri)
     let oauthSuccess = new URLSearchParams(window.location.search).get('oauth_success') === 'True';
 
     const loginDiscordButton = document.getElementById('loginDiscord');
