@@ -74,6 +74,7 @@ function getDoginals(userId) {  // Assuming userId is passed as a parameter
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ inscriptions: inscriptionData, user_id: userId })
+                
             })
             .then(response => response.json())
             .then(data => {

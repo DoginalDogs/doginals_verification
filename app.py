@@ -72,7 +72,7 @@ def verify_holder():
         else:
             return jsonify({"error": "Failed to notify Discord bot"}), 500
     else:
-        return jsonify({"error": "No inscriptions provided"}), 400
+        return jsonify({"error": "No inscriptions from Flask provided"}), 400
 
 @app.route('/verify_signature', methods=['POST']) 
 def verify_signature():
