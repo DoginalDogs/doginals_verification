@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loginWalletButton.addEventListener('click', function() {
             // Call signMessageWithDogeLabsWallet function
             if (typeof window.dogeLabs !== 'undefined') {
-                signMessageWithDogeLabsWallet();
+                signMessageWithDogeLabsWallet(userId);
             } else {
                 alert("Please install the DogeLabs Wallet extension.");
             }
@@ -89,7 +89,7 @@ function getDoginals(userId) {  // Assuming userId is passed as a parameter
         }); 
 }
 
-function signMessageWithDogeLabsWallet() {
+function signMessageWithDogeLabsWallet(userId) {
     if (typeof window.dogeLabs !== 'undefined') {
         window.dogeLabs.requestAccounts()
             .then(accounts => { 
