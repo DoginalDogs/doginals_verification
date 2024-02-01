@@ -22,8 +22,8 @@ def set_csp(response):
 @app.route('/doge_wallet')
 def doge_wallet():
     user_id = request.args.get('user_id', '')
-    client_id = 'https://doginal-dogs-verification-2cc9b2edc81a.herokuapp.com/callback'
-    redirect_uri = None
+    redirect_uri = 'https://doginal-dogs-verification-2cc9b2edc81a.herokuapp.com/callback'
+    client_id = 1195885802786394154
 
     try:
         # Fetch OAuth details from Discord bot
