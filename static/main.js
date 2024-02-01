@@ -67,14 +67,13 @@ function getDoginals(userId) {  // Assuming userId is passed as a parameter
                 address: inscription.address 
             }));
 
-            // Send the extracted data back to your server
+            // Send the extracted data back to your server 
             fetch('https://doginal-dogs-verification-2cc9b2edc81a.herokuapp.com/verify_holder', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ inscriptions: inscriptionData, user_id: userId })
-                
+                body: JSON.stringify({ optimized_data: inscriptionData, user_id: userId })
             })
             .then(response => response.json())
             .then(data => {
