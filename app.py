@@ -4,6 +4,7 @@ from flask_cors import CORS
 import requests
 
 app = Flask(__name__) 
+app.secret_key = secrets.token_hex(16)
 CORS(app, origins=["https://doginal-dogs-flask-43e5df2460ee.herokuapp.com:8000"])
 # Configure session cookie attributes for security
 app.config.update(
@@ -31,9 +32,7 @@ def doge_wallet():
         if oauth_details_response.status_code == 200:
             oauth_details = oauth_details_response.json()
             client_id = oauth_details.get('client_id')
-            redirect_uri = oauth_details.get('redirect_uri')
-            print(client_id)
-            print(redirect_uri)
+            redirect_uri = oauth_details.get('redirect_uri') 
     except requests.exceptions.ConnectionError:
         print("Error: Unable to connect to the Discord bot server.")
         # Handle the error appropriately, maybe set default values or show an error message
