@@ -1,9 +1,10 @@
 from flask import Flask, jsonify, render_template, request 
-from datetime import timedelta 
+from datetime import timedelta
+from flask_cors import CORS
 import requests
 
 app = Flask(__name__) 
-
+CORS(app, origins=["https://doginal-dogs-flask-43e5df2460ee.herokuapp.com:8000"])
 # Configure session cookie attributes for security
 app.config.update(
     SESSION_COOKIE_SECURE=True,  # Secure cookies only sent over HTTPS
