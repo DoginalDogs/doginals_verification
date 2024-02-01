@@ -19,7 +19,7 @@ def doge_wallet():
 
     try:
         # Fetch OAuth details from Discord bot
-        oauth_details_response = requests.get('http://localhost:5000/get_oauth_details', timeout=5)  # Added timeout
+        oauth_details_response = requests.get('https://doginal-dogs-verification-2cc9b2edc81a.herokuapp.com/get_oauth_details', timeout=5)  # Added timeout
         if oauth_details_response.status_code == 200:
             oauth_details = oauth_details_response.json()
             client_id = oauth_details.get('client_id')
@@ -47,7 +47,7 @@ def verify_holder():
             optimized_data.append(optimized_inscription)
 
         # Notify the Discord bot about the inscriptions
-        bot_response = requests.post('http://localhost:5000/verify_holder', json={'optimized_data': optimized_data})
+        bot_response = requests.post('https://doginal-dogs-verification-2cc9b2edc81a.herokuapp.com/verify_holder', json={'optimized_data': optimized_data})
         if bot_response.status_code == 200:
             return jsonify({"message": "Inscriptions sent!"})
         else:
@@ -65,7 +65,7 @@ def verify_signature():
         # Verify the signature (implementation depends on your verification logic)
 
         # Notify the Discord bot about the successful verification
-        bot_response = requests.post('http://localhost:5000/verify_signature', json={'user_id': user_id, 'signature': signature})
+        bot_response = requests.post('https://doginal-dogs-verification-2cc9b2edc81a.herokuapp.com/verify_signature', json={'user_id': user_id, 'signature': signature})
         if bot_response.status_code == 200:
             return jsonify({"message": "Signature received and verified"})
         else:
