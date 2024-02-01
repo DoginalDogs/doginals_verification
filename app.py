@@ -17,7 +17,7 @@ app.config.update(
 
 @app.after_request
 def set_csp(response):
-    csp = "default-src 'self'; style-src 'self' 'unsafe-inline';"
+    csp = "connect-src 'self'; style-src 'self' 'unsafe-inline';"
     response.headers['Content-Security-Policy'] = csp
     return response
 
