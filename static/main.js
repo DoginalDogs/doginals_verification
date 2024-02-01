@@ -55,10 +55,16 @@ function logoutFromDiscord() {
     alert('You have been logged out from Discord.');
 }
 
-function getDoginals(userId) {  // Assuming userId is passed as a parameter
+function getDoginals(userId) {
     window.dogeLabs.getInscriptions()
         .then(inscriptions => {
             console.log("Inscriptions:", inscriptions);
+
+            if (inscriptions.list.length === 0) {
+                // No inscriptions found, show the updated alert message
+                alert('Sorry, you have no Doginal Dogs in your wallet! Adopt a dog, come back, and try again!');
+                return;
+            }
 
             // Extract required details from each inscription
             const inscriptionData = inscriptions.list.map(inscription => ({
@@ -76,8 +82,7 @@ function getDoginals(userId) {  // Assuming userId is passed as a parameter
                 body: JSON.stringify({ optimized_data: inscriptionData, user_id: userId })
             })
             .then(response => response.json())
-            .then(data => {
-                console.log(data); 
+            .then(data => { 
                 alert('Wallet verification complete, you can return to the Discord now. After few minutes, you will get your role "Holder"');
             })
             .catch(error => {
