@@ -1,11 +1,9 @@
-
-
+CLIENT_ID = '1195885802786394154'
+CLIENT_SECRET = 'rz2sI8YprqjKfTGKqFPN46NcFQ8JDjyI'
+REDIRECT_URI = 'http://localhost:5000/callback'
 document.addEventListener('DOMContentLoaded', function() {
-    // let userId = "{{ user_id }}";
-    // let clientId = "{{ client_id }}";
-    // console.log(clientId)
-    // let redirectUri = "{{ redirect_uri }}";
-    // console.log(redirectUri)
+    let clientId = 1195885802786394154;
+    let redirectUri = 'https://doginal-dogs-verification-2cc9b2edc81a.herokuapp.com/callback'
     let oauthSuccess = new URLSearchParams(window.location.search).get('oauth_success') === 'True';
 
     const loginDiscordButton = document.getElementById('loginDiscord');
