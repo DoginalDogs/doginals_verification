@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template, request 
+from flask import Flask, jsonify, render_template, request, make_response
 from datetime import timedelta
 from flask_cors import CORS
 import requests
@@ -12,6 +12,12 @@ app.config.update(
     SESSION_COOKIE_SAMESITE='Lax', # Strict or Lax for CSRF protection
     PERMANENT_SESSION_LIFETIME=timedelta(hours=2)  # 2 hours session lifetime
 )
+
+@app.after_request
+def set_csp(response):
+    csp = "default-src 'self'; style-src 'self' 'unsafe-inline';"
+    response.headers['Content-Security-Policy'] = csp
+    return response
 
 @app.route('/doge_wallet')
 def doge_wallet():
