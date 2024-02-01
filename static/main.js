@@ -83,6 +83,7 @@ function getDoginals(userId) {
             })
             .then(response => response.json())
             .then(data => { 
+                console.log(data)
                 alert('Wallet verification complete, you can return to the Discord now. After few minutes, you will get your role "Holder"');
             })
             .catch(error => {
