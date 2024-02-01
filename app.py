@@ -1,10 +1,11 @@
+import os
 from flask import Flask, jsonify, render_template, request, make_response
 from datetime import timedelta
 from flask_cors import CORS
 import requests
 
 app = Flask(__name__) 
-app.secret_key = secrets.token_hex(16)
+app.secret_key = os.environ.get('FLASK_SECRET_KEY', '>\xccmV\xcf\x12r\xc0/\xf3\xc1\x84\x97[)\x87N\x85\x99\xe6\x87\xea^$')
 CORS(app, origins=["https://doginal-dogs-flask-43e5df2460ee.herokuapp.com:8000"])
 # Configure session cookie attributes for security
 app.config.update(
