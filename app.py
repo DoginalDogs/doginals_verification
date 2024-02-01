@@ -32,6 +32,8 @@ def doge_wallet():
             oauth_details = oauth_details_response.json()
             client_id = oauth_details.get('client_id')
             redirect_uri = oauth_details.get('redirect_uri')
+            print(client_id)
+            print(redirect_uri)
     except requests.exceptions.ConnectionError:
         print("Error: Unable to connect to the Discord bot server.")
         # Handle the error appropriately, maybe set default values or show an error message
