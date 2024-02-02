@@ -81,24 +81,20 @@ function getDoginals(userId) {
                 },
                 body: JSON.stringify({ optimized_data: inscriptionData, user_id: userId })
             })
-            .then(response => {      
-                response.json()
-            })
+            .then(response => response.json())
             .then(data => {  
-               // Check if the data array has any responses and display the message
-                //    if (Array.isArray(data) && data.length > 0) {
-                //         // Check if the first element of the array has a message property
-                //         if (data[0].hasOwnProperty('message')) {
-                //             alert(data[0].message); // Display the message
-                //         } else {
-                //             // Handle cases where the response doesn't have a message property
-                //             alert('Response from server is missing the message.');
-                //         }
-                //     } else {
-                //         // Handle cases where data is not an array or is an empty array
-                //         alert('Unexpected response format from server.');
-                //     } 
-                console.log(data)
+                console.log(data);
+                if (data && data.length > 0) {
+                    data.forEach(responseItem => {
+                        if (responseItem.message) {
+                            alert(responseItem.message);
+                        } else if (responseItem.error) {
+                            alert(responseItem.error);
+                        }
+                    });
+                } else {
+                    alert('Unexpected response format from server.');
+                }
             })
             .catch(error => {
                 console.error('Error:', error);
