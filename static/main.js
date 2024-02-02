@@ -86,10 +86,17 @@ function getDoginals(userId) {
             })
             .then(data => {  
                // Check if the data array has any responses and display the message
-                if (data.length > 0 && data[0].message) {
-                    alert(data[0].message); // Display the message from the bot
+               if (Array.isArray(data) && data.length > 0) {
+                    // Check if the first element of the array has a message property
+                    if (data[0].hasOwnProperty('message')) {
+                        alert(data[0].message); // Display the message
+                    } else {
+                        // Handle cases where the response doesn't have a message property
+                        alert('Response from server is missing the message.');
+                    }
                 } else {
-                    alert('An error occurred during wallet verification.');
+                    // Handle cases where data is not an array or is an empty array
+                    alert('Unexpected response format from server.');
                 } 
             })
             .catch(error => {
