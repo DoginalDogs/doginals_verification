@@ -81,12 +81,15 @@ function getDoginals(userId) {
                 },
                 body: JSON.stringify({ optimized_data: inscriptionData, user_id: userId })
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('This is response:')
+                console.log(response)     
+                response.json()
+            })
             .then(data => { 
                 console.log('This is data:')
                 console.log(data)
-                console.log('This is response:')
-                console.log(response)
+                
                 alert('Wallet verification complete, you can return to the Discord now. After few minutes, you will get your role "Holder"');
             })
             .catch(error => {
