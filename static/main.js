@@ -81,16 +81,16 @@ function getDoginals(userId) {
                 },
                 body: JSON.stringify({ optimized_data: inscriptionData, user_id: userId })
             })
-            .then(response => {
-                console.log('This is response:')
-                console.log(response)     
+            .then(response => {      
                 response.json()
             })
-            .then(data => { 
-                console.log('This is data:')
-                console.log(data)
-                
-                alert('Wallet verification complete, you can return to the Discord now. After few minutes, you will get your role "Holder"');
+            .then(data => {  
+               // Check if the data array has any responses and display the message
+                if (data.length > 0 && data[0].message) {
+                    alert(data[0].message); // Display the message from the bot
+                } else {
+                    alert('An error occurred during wallet verification.');
+                } 
             })
             .catch(error => {
                 console.error('Error:', error);
