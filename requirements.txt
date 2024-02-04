@@ -1,5 +1,0 @@
-flask
-datetime
-requests
-gunicorn
-flask_cors
