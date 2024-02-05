@@ -1,11 +1,11 @@
 @font-face {
     font-family: 'Retro Gaming';
-    src: url("{{ url_for('static', filename='Retro_Gaming.ttf') }}") format('truetype');
+    src: url("/static/Retro_Gaming.ttf") format('truetype');
 }
 
 @font-face {
     font-family: 'Varela Regular';
-    src: url("{{ url_for('static', filename='Varela-Regular.ttf') }}") format('truetype');
+    src: url("/static/Varela-Regular.ttf") format('truetype');
 }
 
 h1, .button {
