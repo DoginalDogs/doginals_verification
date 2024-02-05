@@ -85,7 +85,7 @@ function getDoginals(userId) {
             .then(data => {  
                 console.log(data);
                 if (data && data.length > 0) {
-        // Check for both message and error properties
+                    // Check for both message and error properties
                     data.forEach(response => {
                         if (response.hasOwnProperty('message')) {
                             alert(response.message);
