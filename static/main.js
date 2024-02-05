@@ -85,9 +85,14 @@ function getDoginals(userId) {
             .then(data => {  
                 console.log(data);
                 if (data && data.length > 0) {
-                    if (data[0].hasOwnProperty('message')) {
-                        alert(data[0].message); 
-                    } 
+        // Check for both message and error properties
+                    data.forEach(response => {
+                        if (response.hasOwnProperty('message')) {
+                            alert(response.message);
+                        } else if (response.hasOwnProperty('error')) {
+                            alert(response.error);
+                        }
+                    });
                 } else {
                     alert('Unexpected response format from server.');
                 }
