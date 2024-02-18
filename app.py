@@ -6,7 +6,7 @@ import requests
 
 app = Flask(__name__) 
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', '>\xccmV\xcf\x12r\xc0/\xf3\xc1\x84\x97[)\x87N\x85\x99\xe6\x87\xea^$')
-CORS(app, origins=["https://doginal-dogs-flask-43e5df2460ee.herokuapp.com:8000"])
+CORS(app, origins=[" https://verify.doginaldogs.com:8000"])
 CORS(app, resources={
     r"/verify_signature": {"origins": "https://doginal-dogs-verification-2cc9b2edc81a.herokuapp.com"},
     r"/verify_holder": {"origins": "https://doginal-dogs-verification-2cc9b2edc81a.herokuapp.com"},
