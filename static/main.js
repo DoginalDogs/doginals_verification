@@ -55,7 +55,7 @@ function logoutFromDiscord() {
     alert('You have been logged out from Discord.');
 }
 
-function getDoginals(userId, cursor = 0, allInscriptions = []) {
+async function getDoginals(userId, cursor = 0, allInscriptions = []) {
     window.dogeLabs.getInscriptions(cursor)
         .then(response => {
             console.log("Inscriptions:", response);
@@ -120,41 +120,36 @@ function getDoginals(userId, cursor = 0, allInscriptions = []) {
         }); 
 }
 
-function signMessageWithDogeLabsWallet(userId) {
-    if (typeof window.dogeLabs !== 'undefined') {
-        window.dogeLabs.requestAccounts()
-            .then(accounts => { 
-                const messageToSign = "Sign to Prove Ownership";
-                const messageType = "text";
-
-                window.dogeLabs.signMessage(messageToSign, messageType)
-                    .then(signature => {
-                        console.log("Message Signature:", signature);
-                        // Rest of your logic
-                        fetch('https://doginal-dogs-verification-2cc9b2edc81a.herokuapp.com/verify_signature', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ signature: signature, user_id: userId })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log(data);
-                            getDoginals(userId); 
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                        });
-                    })
-                    .catch(error => {
-                        console.error("Error signing message:", error.message);
-                    });
-            })
-            .catch(error => {
-                console.error("Error getting accounts:", error.message);
-            });
-    } else {
+async function signMessageWithDogeLabsWallet(userId) {
+    if (typeof window.dogeLabs === 'undefined') {
         alert("Please install the DogeLabs Wallet extension.");
+        return;
+    }
+
+    try {
+        const accounts = await window.dogeLabs.requestAccounts();
+        const messageToSign = "Sign to Prove Ownership";
+        const messageType = "text";
+
+        const signature = await window.dogeLabs.signMessage(messageToSign, messageType);
+        console.log("Message Signature:", signature);
+
+        const response = await fetch('https://doginal-dogs-verification-2cc9b2edc81a.herokuapp.com/verify_signature', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ signature: signature, user_id: userId })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log(data);
+        await getDoginals(userId);
+    } catch (error) {
+        console.error("Error:", error.message);
     }
 }
