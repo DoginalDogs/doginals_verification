@@ -25,7 +25,7 @@ def set_csp(response):
     csp = (
         "default-src 'self'; "
         "style-src 'self' 'unsafe-inline'; "
-        "connect-src 'self' https://doginal-dogs-verification-2cc9b2edc81a.herokuapp.com/;"
+        "connect-src 'self' https://verify.doginaldogs.com/;"
     )
     response.headers['Content-Security-Policy'] = csp
     return response
