@@ -86,11 +86,16 @@ function getDoginals(userId) {
                 console.log(data);
                 if (data && data.length > 0) {
                     // Check for both message and error properties
+                    let alertShown = false; // Flag to check if alert has been shown 
                     data.forEach(response => {
-                        if (response.hasOwnProperty('message')) {
-                            alert(response.message);
-                        } else if (response.hasOwnProperty('error')) {
-                            alert(response.error);
+                        if (!alertShown) {
+                            if (response.hasOwnProperty('message')) {
+                                alert(response.message);
+                                alertShown = true; // Set the flag after showing the alert
+                            } else if (response.hasOwnProperty('error')) {
+                                alert(response.error);
+                                alertShown = true; // Set the flag after showing the alert
+                            }
                         }
                     });
                 } else {
