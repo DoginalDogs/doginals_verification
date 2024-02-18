@@ -128,6 +128,12 @@ async function signMessageWithDogeLabsWallet(userId) {
 
     try {
         const accounts = await window.dogeLabs.requestAccounts();
+ 
+        if (!accounts || accounts.length === 0) {
+            alert("No accounts found. Please ensure your wallet is connected and try again.");
+            return;
+        }
+        
         const messageToSign = "Sign to Prove Ownership";
         const messageType = "text";
 
