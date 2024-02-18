@@ -94,18 +94,24 @@ async function getDoginals(userId, cursor = 0, allInscriptions = []) {
                     console.log(data);
                     if (data && data.length > 0) {
                         // Check for both message and error properties
-                        let alertShown = false; // Flag to check if alert has been shown 
+                        let alertShown = false;
+                        let firstError = "";
+
                         data.forEach(response => {
                             if (!alertShown) {
                                 if (response.hasOwnProperty('message')) {
                                     alert(response.message);
                                     alertShown = true; // Set the flag after showing the alert
-                                } else if (response.hasOwnProperty('error')) {
-                                    alert(response.error);
-                                    alertShown = true; // Set the flag after showing the alert
+                                } else if (response.hasOwnProperty('error') && !firstError) {
+                                    firstError = response.error; // Store the first error encountered
                                 }
                             }
                         });
+
+                        // If no message was found and an error exists, show the first error
+                        if (!alertShown && firstError) {
+                            alert(firstError);
+                        }
                     } else {
                         alert('Unexpected response format from server.');
                     }
