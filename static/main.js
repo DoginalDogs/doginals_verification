@@ -55,56 +55,65 @@ function logoutFromDiscord() {
     alert('You have been logged out from Discord.');
 }
 
-function getDoginals(userId) {
-    window.dogeLabs.getInscriptions()
-        .then(inscriptions => {
-            console.log("Inscriptions:", inscriptions);
+function getDoginals(userId, cursor = 0, allInscriptions = []) {
+    window.dogeLabs.getInscriptions(cursor)
+        .then(response => {
+            console.log("Inscriptions:", response);
 
-            if (inscriptions.list.length === 0) {
+            if (response.list.length === 0 && cursor === 0) {
                 // No inscriptions found, show the updated alert message
                 alert('Sorry, you have no Doginal Dogs in your wallet! Adopt a dog, come back, and try again!');
                 return;
             }
 
-            // Extract required details from each inscription
-            const inscriptionData = inscriptions.list.map(inscription => ({
-                user_id: userId,
-                inscriptionNumber: inscription.inscriptionNumber,
-                address: inscription.address 
-            }));
+            // Concatenate the new inscriptions with the previous array
+            allInscriptions = allInscriptions.concat(response.list);
 
-            // Send the extracted data back to your server 
-            fetch('https://doginal-dogs-verification-2cc9b2edc81a.herokuapp.com/verify_holder', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ optimized_data: inscriptionData, user_id: userId })
-            })
-            .then(response => response.json())
-            .then(data => {  
-                console.log(data);
-                if (data && data.length > 0) {
-                    // Check for both message and error properties
-                    let alertShown = false; // Flag to check if alert has been shown 
-                    data.forEach(response => {
-                        if (!alertShown) {
-                            if (response.hasOwnProperty('message')) {
-                                alert(response.message);
-                                alertShown = true; // Set the flag after showing the alert
-                            } else if (response.hasOwnProperty('error')) {
-                                alert(response.error);
-                                alertShown = true; // Set the flag after showing the alert
+            // Check if there are more inscriptions to load
+            if (response.list.length === 20) {
+                // Recursively call getDoginals with the new cursor value
+                getDoginals(userId, cursor + 20, allInscriptions);
+            } else {
+                // All inscriptions have been loaded, proceed with the logic
+                const inscriptionData = allInscriptions.map(inscription => ({
+                    user_id: userId,
+                    inscriptionNumber: inscription.inscriptionNumber,
+                    address: inscription.address
+                }));
+
+                // Send the extracted data back to your server
+                fetch('https://doginal-dogs-verification-2cc9b2edc81a.herokuapp.com/verify_holder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ optimized_data: inscriptionData, user_id: userId })
+                })
+                .then(response => response.json())
+                .then(data => {  
+                    console.log(data);
+                    if (data && data.length > 0) {
+                        // Check for both message and error properties
+                        let alertShown = false; // Flag to check if alert has been shown 
+                        data.forEach(response => {
+                            if (!alertShown) {
+                                if (response.hasOwnProperty('message')) {
+                                    alert(response.message);
+                                    alertShown = true; // Set the flag after showing the alert
+                                } else if (response.hasOwnProperty('error')) {
+                                    alert(response.error);
+                                    alertShown = true; // Set the flag after showing the alert
+                                }
                             }
-                        }
-                    });
-                } else {
-                    alert('Unexpected response format from server.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+                        });
+                    } else {
+                        alert('Unexpected response format from server.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
         })
         .catch(error => {
             console.error("Error fetching inscriptions:", error.message);
