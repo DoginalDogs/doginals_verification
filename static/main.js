@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const loginDiscordButton = document.getElementById('loginDiscord');
     const loginWalletButton = document.getElementById('loginWallet');
     const logoutDiscordButton = document.getElementById('logoutDiscord');
-    
+
     if (logoutDiscordButton) {
         logoutDiscordButton.addEventListener('click', logoutFromDiscord);
     }
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loginDiscordButton.style.display = 'none';
         logoutDiscordButton.style.display = 'block';
         loginWalletButton.style.display = 'block';
-    } 
+    }
 
     if (loginWalletButton) {
         loginWalletButton.addEventListener('click', function() {
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-}); 
+});
 
 function logoutFromDiscord() {
     sessionStorage.removeItem('discordToken');
@@ -70,6 +70,8 @@ async function getDoginals(userId, cursor = 0, allInscriptions = []) {
                 address: inscription.address
             }));
 
+            console.log(inscriptionData);
+
             const res = await fetch('https://doginal-dogs-verification-2cc9b2edc81a.herokuapp.com/verify_holder', {
                 method: 'POST',
                 headers: {
@@ -77,7 +79,7 @@ async function getDoginals(userId, cursor = 0, allInscriptions = []) {
                 },
                 body: JSON.stringify({ optimized_data: inscriptionData, user_id: userId })
             });
-            
+
             const data = await res.json();
             console.log(data);
 
