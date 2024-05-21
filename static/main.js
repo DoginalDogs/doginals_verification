@@ -60,9 +60,11 @@ async function getDoginals(userId, cursor = 0, allInscriptions = []) {
 
         allInscriptions = allInscriptions.concat(response.list);
 
-        if (response.list.length === 20) {
+        if (response.hasMore) {
             await getDoginals(userId, cursor + 20, allInscriptions);
         } else {
+            console.log("Total Inscriptions:", allInscriptions);
+
             const inscriptionData = allInscriptions.map(inscription => ({
                 user_id: userId,
                 inscriptionId: inscription.inscriptionId,
