@@ -60,7 +60,8 @@ async function getDoginals(userId, cursor = 0, allInscriptions = []) {
 
         allInscriptions = allInscriptions.concat(response.list);
 
-        if (response.hasMore) {
+        if (response.list.length > 0) {
+            // Continue fetching if we received a non-empty list
             await getDoginals(userId, cursor + 20, allInscriptions);
         } else {
             console.log("Total Inscriptions:", allInscriptions);
