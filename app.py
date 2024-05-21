@@ -61,7 +61,6 @@ def verify_holder():
             optimized_inscription = {
                 'user_id': inscription.get('user_id'),
                 'inscriptionNumber': inscription.get('inscriptionNumber'),
-                'inscriptionId': inscription.get('inscriptionId'),
                 'address': inscription.get('address') 
             }
             optimized_data.append(optimized_inscription)
