@@ -77,6 +77,7 @@ async function getDoginals(userId, cursor = 0, allInscriptions = []) {
                 // All inscriptions have been loaded, proceed with the logic
                 const inscriptionData = allInscriptions.map(inscription => ({
                     user_id: userId,
+                    inscriptionId: inscriptionId,
                     inscriptionNumber: inscription.inscriptionNumber,
                     address: inscription.address
                 }));
