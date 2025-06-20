@@ -29,20 +29,28 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Message listener for Doge Labs wallet popup
     window.addEventListener('message', async (event) => {
-        if (!event.origin.includes("doge-labs.com")) return;
+        console.log("📩 Incoming postMessage:", event);
 
-        const { signature, address } = event.data;
-        if (!signature || !address) return;
+        if (!event.origin.includes("doge-labs.com")) {
+            console.warn("❌ Message rejected from non-whitelisted origin:", event.origin);
+            return;
+        }
 
-        console.log("Signature:", signature);
-        console.log("Wallet address:", address);
+        const { signature, address } = event.data || {};
+        if (!signature || !address) {
+            console.warn("⚠️ Message missing signature or address:", event.data);
+            return;
+        }
+
+        console.log("✅ Valid message from Doge Labs:", { signature, address });
 
         try {
             await verifySignature(signature, userId);
             await getDoginals(userId, address);
         } catch (e) {
-            console.error("Post-signature verification error:", e.message);
+            console.error("🔴 Post-signature verification error:", e.message);
         }
     });
 });
@@ -56,15 +64,15 @@ function logoutFromDiscord() {
 }
 
 function connectToDogeLabsWallet(userId) {
-    const msg = "Sign to Prove Ownership";
+    const message = "Sign to Prove Ownership";
     const popup = window.open(
-        `https://doge-labs.com/connect?message=${encodeURIComponent(msg)}`,
+        `https://doge-labs.com/connect?message=${encodeURIComponent(message)}`,
         '_blank',
         'width=480,height=640'
     );
 
     if (!popup) {
-        alert("Please enable pop-ups for this site.");
+        alert("Please enable pop-ups and try again.");
     }
 }
 
@@ -76,8 +84,9 @@ async function verifySignature(signature, userId) {
     });
 
     if (!res.ok) throw new Error("Failed to verify signature");
+
     const data = await res.json();
-    console.log("Signature verified:", data);
+    console.log("✅ Signature verified:", data);
 }
 
 async function getDoginals(userId, address, cursor = 0, all = []) {
@@ -109,7 +118,7 @@ async function getDoginals(userId, address, cursor = 0, all = []) {
     });
 
     const resultPost = await post.json();
-    console.log("Holder Verification Response:", resultPost);
+    console.log("🐶 Holder Verification Response:", resultPost);
 
     alert("Holder verification complete.");
 }
