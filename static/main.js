@@ -1,25 +1,19 @@
-document.addEventListener('DOMContentLoaded', function() {
-    let userId = new URLSearchParams(window.location.search).get('user_id');
-    let clientId = '1195885802786394154';
-    let redirectUri = 'https://doginal-dogs-verification-2cc9b2edc81a.herokuapp.com/callback';
-    let oauthSuccess = new URLSearchParams(window.location.search).get('oauth_success') === 'True';
-
+document.addEventListener('DOMContentLoaded', function () {
+    const userId = document.getElementById('loginWallet')?.dataset?.userId;
     const loginDiscordButton = document.getElementById('loginDiscord');
     const loginWalletButton = document.getElementById('loginWallet');
     const logoutDiscordButton = document.getElementById('logoutDiscord');
+    const oauthSuccess = new URLSearchParams(window.location.search).get('oauth_success') === 'True';
 
     if (logoutDiscordButton) {
         logoutDiscordButton.addEventListener('click', logoutFromDiscord);
     }
 
     if (loginDiscordButton) {
-        loginDiscordButton.addEventListener('click', function() {
-            if (clientId && redirectUri) {
-                window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=identify`;
-            } else {
-                console.error("OAuth details are missing.");
-                alert("OAuth details are missing.");
-            }
+        loginDiscordButton.addEventListener('click', () => {
+            const clientId = '1195885802786394154';
+            const redirectUri = 'https://doginal-dogs-verification-2cc9b2edc81a.herokuapp.com/callback';
+            window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=identify`;
         });
     }
 
@@ -30,14 +24,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (loginWalletButton) {
-        loginWalletButton.addEventListener('click', function() {
-            if (typeof window.dogeLabs !== 'undefined') {
-                signMessageWithDogeLabsWallet(userId);
-            } else {
-                alert("Please install the DogeLabs Wallet extension.");
-            }
+        loginWalletButton.addEventListener('click', () => {
+            connectToDogeLabsWallet(userId);
         });
     }
+
+    window.addEventListener('message', async (event) => {
+        if (event.origin !== 'https://doge-labs.com') return;
+        const { signature, address } = event.data;
+        if (signature && address) {
+            await verifySignature(signature, userId);
+            await getDoginals(userId, address);
+        }
+    });
 });
 
 function logoutFromDiscord() {
@@ -48,107 +47,68 @@ function logoutFromDiscord() {
     alert('You have been logged out from Discord.');
 }
 
-async function getDoginals(userId, cursor = 0, allInscriptions = []) {
-    try {
-        const response = await window.dogeLabs.getInscriptions(cursor);
-        console.log("Inscriptions:", response);
+function connectToDogeLabsWallet(userId) {
+    const popup = window.open(
+        `https://doge-labs.com/connect?message=${encodeURIComponent("Sign to Prove Ownership")}`,
+        '_blank',
+        'width=480,height=640'
+    );
 
-        if (response.list.length === 0 && cursor === 0) {
-            alert('Sorry, you have no Doginal Dogs in your wallet! Adopt a dog, come back, and try again!');
-            return;
-        }
-
-        allInscriptions = allInscriptions.concat(response.list);
-
-        if (response.list.length > 0) {
-            // Continue fetching if we received a non-empty list
-            await getDoginals(userId, cursor + 20, allInscriptions);
-        } else {
-            console.log("Total Inscriptions:", allInscriptions);
-
-            const inscriptionData = allInscriptions.map(inscription => ({
-                user_id: userId,
-                inscriptionId: inscription.inscriptionId,
-                inscriptionNumber: inscription.inscriptionNumber,
-                address: inscription.address
-            }));
-
-            console.log(inscriptionData);
-
-            const res = await fetch('https://doginal-dogs-verification-2cc9b2edc81a.herokuapp.com/verify_holder', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ optimized_data: inscriptionData, user_id: userId })
-            });
-
-            const data = await res.json();
-            console.log(data);
-
-            if (data && data.length > 0) {
-                let alertShown = false;
-                let firstError = "";
-
-                data.forEach(response => {
-                    if (!alertShown) {
-                        if (response.hasOwnProperty('message')) {
-                            alert(response.message);
-                            alertShown = true;
-                        } else if (response.hasOwnProperty('error') && !firstError) {
-                            firstError = response.error;
-                        }
-                    }
-                });
-
-                if (!alertShown && firstError) {
-                    alert(firstError);
-                }
-            } else {
-                alert('Unexpected response format from server.');
-            }
-        }
-    } catch (error) {
-        console.error("Error fetching inscriptions:", error.message);
+    if (!popup) {
+        alert("Please allow pop-ups and try again.");
     }
 }
 
-async function signMessageWithDogeLabsWallet(userId) {
-    if (typeof window.dogeLabs === 'undefined') {
-        alert("Please install the DogeLabs Wallet extension.");
-        return;
-    }
-
+async function verifySignature(signature, userId) {
     try {
-        const accounts = await window.dogeLabs.requestAccounts();
-
-        if (!accounts || accounts.length === 0) {
-            alert("No accounts found. Please ensure your wallet is connected and try again.");
-            return;
-        }
-
-        const messageToSign = "Sign to Prove Ownership";
-        const messageType = "text";
-
-        const signature = await window.dogeLabs.signMessage(messageToSign, messageType);
-        console.log("Message Signature:", signature);
-
         const response = await fetch('https://doginal-dogs-verification-2cc9b2edc81a.herokuapp.com/verify_signature', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ signature: signature, user_id: userId })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ signature, user_id: userId })
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+        if (!response.ok) throw new Error("Signature verification failed.");
+        const data = await response.json();
+        console.log("Signature verified:", data);
+    } catch (err) {
+        console.error("Verification error:", err.message);
+        alert("Verification failed.");
+    }
+}
+
+async function getDoginals(userId, address, cursor = 0, all = []) {
+    try {
+        const res = await fetch(`https://api.doge-labs.com/wallet/${address}/inscriptions?cursor=${cursor}`);
+        const result = await res.json();
+        const inscriptions = result.list || [];
+
+        if (cursor === 0 && inscriptions.length === 0) {
+            return alert("No Doginal Dogs found in your wallet.");
         }
 
-        const data = await response.json();
-        console.log(data);
-        await getDoginals(userId);
-    } catch (error) {
-        console.error("Error:", error.message);
+        all = all.concat(inscriptions);
+
+        if (inscriptions.length === 20) {
+            return getDoginals(userId, address, cursor + 20, all);
+        }
+
+        const payload = all.map(i => ({
+            user_id: userId,
+            inscriptionId: i.inscriptionId,
+            inscriptionNumber: i.inscriptionNumber,
+            address: i.address
+        }));
+
+        const postRes = await fetch('https://doginal-dogs-verification-2cc9b2edc81a.herokuapp.com/verify_holder', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ optimized_data: payload, user_id: userId })
+        });
+
+        const data = await postRes.json();
+        console.log("Verification Result:", data);
+        alert("Holder verification complete.");
+    } catch (err) {
+        console.error("Error fetching Doginals:", err.message);
     }
 }
