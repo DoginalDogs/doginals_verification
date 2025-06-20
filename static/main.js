@@ -31,26 +31,29 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Message listener for Doge Labs wallet popup
     window.addEventListener('message', async (event) => {
-        console.log("📩 Incoming postMessage:", event);
+        const allowedOrigins = [
+            "https://doge-labs.com",
+            "https://verify.doginaldogs.com"
+        ];
 
-        if (!event.origin.includes("doge-labs.com")) {
+        if (!allowedOrigins.includes(event.origin)) {
             console.warn("❌ Message rejected from non-whitelisted origin:", event.origin);
             return;
         }
 
         const { signature, address } = event.data || {};
         if (!signature || !address) {
-            console.warn("⚠️ Message missing signature or address:", event.data);
+            console.warn("⚠️ Missing signature or address in message:", event.data);
             return;
         }
 
-        console.log("✅ Valid message from Doge Labs:", { signature, address });
+        console.log("✅ Valid message received:", { signature, address });
 
         try {
             await verifySignature(signature, userId);
             await getDoginals(userId, address);
         } catch (e) {
-            console.error("🔴 Post-signature verification error:", e.message);
+            console.error("🔴 Error during verification:", e.message);
         }
     });
 });
