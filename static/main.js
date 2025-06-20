@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Listen for postMessage response from doge-labs.com
     window.addEventListener('message', async (event) => {
         if (!event.origin.includes("doge-labs.com")) return;
 
